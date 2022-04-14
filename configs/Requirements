@@ -1,0 +1,7 @@
+fastapi
+tensorflow
+matplotlib
+opencv-python-headless
+python-multipart
+numpy
+hypercorn
