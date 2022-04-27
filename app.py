@@ -3,8 +3,9 @@ import json
 import cv2
 from fastapi import FastAPI, UploadFile
 import numpy as np
-from pydantic import BaseModel
+from handler.http_handler import init_http_exception_handler
 from models.captcha_models import *
+from models.response_models import captcha_response
 
 from hypercorn.asyncio import serve
 from hypercorn import Config
@@ -20,12 +21,9 @@ app = FastAPI(
     terms_of_service="",
 )
 
+init_http_exception_handler(app)
 
-class captcha_response(BaseModel):
-    status: str
-    res: str
 
-    
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
