@@ -2,6 +2,8 @@
 import json
 import cv2
 from fastapi import FastAPI, UploadFile
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 import numpy as np
 from handler.http_handler import init_http_exception_handler
 from models.captcha_models import *
@@ -46,11 +48,12 @@ async def captcha_id(file: UploadFile):
         - type: file
         - required: true
     - **responses**:
-        - status:
+        - HttpStatus:
             - 200: 回傳運算結果
             - 400: 檔案上傳不成功 / 檔案格式不符
-            - 404: 更版或維修中，請通知數數部
-            - 500: 服務機出現異常，請通知數數部
+            - 404: 更版或維修中，請通知管理員
+            - 500: 服務機出現異常，請通知管理員
+        - status: S成功 F失敗
         - res: 運算結果或錯誤資訊
     """
     
@@ -67,11 +70,11 @@ async def captcha_id(file: UploadFile):
                 model.load_weights('./checkpoints/verificatioin_code-1118-id.h5')
                 captcha_text = model.predict(image)
                 # return captcha text
-                return captcha_response(status = 200, res = captcha_text)
+                return JSONResponse(jsonable_encoder(captcha_response(status = "S", res = captcha_text)), 200)
             except:
-                return captcha_response(status = 500, res = '服務機出現異常，請通知數數部')
+                return JSONResponse(jsonable_encoder(captcha_response(status = "F", res = '服務機出現異常，請通知管理員')), 500)
         else:
-            return  captcha_response(status = 400, res = '檔案格式不符')
+            return JSONResponse(jsonable_encoder(captcha_response(status = "F", res = '檔案格式不符')), 400)
 
 
 if __name__ == "__main__":
